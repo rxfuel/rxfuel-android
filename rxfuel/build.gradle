@@ -10,10 +10,8 @@ android {
         minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
-        versionName "1.0"
-
+        versionName "0.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -22,10 +20,32 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
 }
 
 ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'rxfuel-android'
+
+    publishedGroupId = 'com.rxfuel.rxfuel'
+    libraryName = 'RxFuel Android'
+    artifact = 'rxfuel-android'
+
+    libraryDescription = 'A lightweight framework for creating fully reactive apps'
+
+    siteUrl = 'https://rxfuel.github.io'
+    gitUrl = 'https://github.com/rxfuel/rxfuel-android'
+
+    libraryVersion = '0.0.1'
+
+    developerId = 'rxfuel'
+    developerName = 'Salah Abdul Salam'
+    developerEmail = 'nh.salah@gmail.com'
+    organization = 'rxfuel'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+
     arch_version = '1.1.0'
 }
 
@@ -45,3 +65,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 }
+
+apply from: rootProject.file('gradle/install.gradle')
+apply from: rootProject.file('gradle/bintray.gradle')
