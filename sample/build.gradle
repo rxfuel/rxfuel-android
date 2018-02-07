@@ -20,9 +20,6 @@ android {
         }
     }
 
-    kapt {
-        generateStubs = true
-    }
     sourceSets { main { java.srcDirs = ['src/main/java', 'src/mock/java'] } }
 }
 
