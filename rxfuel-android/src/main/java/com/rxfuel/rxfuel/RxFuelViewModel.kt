@@ -74,4 +74,9 @@ abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuel
 
     abstract fun resultToViewState(previousState: VS, result: R) : VS
 
+    override fun onCleared() {
+        super.onCleared()
+
+    }
+
 }

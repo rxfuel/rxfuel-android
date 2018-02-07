@@ -2,7 +2,6 @@ package com.rxfuel.rxfuelsample.ui.repoList
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
@@ -25,16 +24,25 @@ import com.rxfuel.rxfuelsample.ui.detail.DetailEvent
 
 class RepoListActivity : DaggerAppCompatActivity(), RxFuelView<RepoListEvent, RepoListViewState> {
 
+    private val rxFuel : RxFuel = RxFuel(this)
+
     @Inject
     lateinit var repoListViewModel : RepoListViewModel
+
     private val reposSubject: PublishSubject<List<Repo>> = PublishSubject.create()
+
     private val reposAdapter = RepoListAdapter(reposSubject)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         rv_repos.adapter = reposAdapter
-        RxFuel.bind(this,repoListViewModel)
+        rxFuel.bind(repoListViewModel)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        rxFuel.unbind()
     }
 
     override fun events(): Observable<RepoListEvent>? {
@@ -56,7 +64,7 @@ class RepoListActivity : DaggerAppCompatActivity(), RxFuelView<RepoListEvent, Re
         if(state.errorMessage!=null) Toast.makeText(this,state.errorMessage,LENGTH_LONG).show()
         if(state.navigate!=null) {
             when(state.navigate){
-                RepoListActivity::class -> RxFuel.navigateTo(this, DetailActivity::class, DetailEvent.DisplayRepoEvent(state.lastClickedRepo!!))
+                RepoListActivity::class -> rxFuel.navigateTo(DetailActivity::class, DetailEvent.DisplayRepoEvent(state.lastClickedRepo!!))
             }
         }
     }
