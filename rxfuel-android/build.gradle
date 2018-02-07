@@ -35,7 +35,7 @@ ext {
     siteUrl = 'https://rxfuel.github.io'
     gitUrl = 'https://github.com/rxfuel/rxfuel-android'
 
-    libraryVersion = '0.0.1'
+    libraryVersion = '0.0.2'
 
     developerId = 'rxfuel'
     developerName = 'Salah Abdul Salam'
