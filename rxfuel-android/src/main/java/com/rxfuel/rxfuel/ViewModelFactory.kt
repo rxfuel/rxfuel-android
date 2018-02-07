@@ -7,9 +7,10 @@ import android.arch.lifecycle.ViewModelProvider
 import java.util.HashMap
 
 /**
- * Created by salah on 24/1/18.
+ * Provides ViewModel instance that is persisted across activity lifecycle.
+ *
+ * @author Salah (nh.salah@gmail.com)
  */
-
 class ViewModelFactory : ViewModelProvider.Factory {
 
     private val viewModelHashMap = HashMap<Class<out ViewModel>, ViewModel>()

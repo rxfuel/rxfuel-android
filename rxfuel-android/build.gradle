@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'org.jetbrains.dokka-android'
 
 android {
     compileSdkVersion 27
@@ -10,7 +11,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
-        versionName "0.0.1"
+        versionName "0.0.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -35,7 +36,7 @@ ext {
     siteUrl = 'https://rxfuel.github.io'
     gitUrl = 'https://github.com/rxfuel/rxfuel-android'
 
-    libraryVersion = '0.0.2'
+    libraryVersion = '0.0.3'
 
     developerId = 'rxfuel'
     developerName = 'Salah Abdul Salam'
@@ -49,7 +50,14 @@ ext {
     arch_version = '1.1.0'
 }
 
+task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
+    outputFormat = 'html'
+    outputDirectory = "$buildDir/javadoc"
+}
+
+
 dependencies {
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     kapt "android.arch.lifecycle:compiler:$arch_version"

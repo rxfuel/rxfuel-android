@@ -1,7 +1,8 @@
 package com.rxfuel.rxfuel
 
 /**
- * Created by salah on 23/1/18.
+ * Interface to implement Action. Action classes are holders of data that need to be processed asynchronously.
+ *
+ * @author Salah (nh.salah@gmail.com)
  */
-
 interface RxFuelAction
