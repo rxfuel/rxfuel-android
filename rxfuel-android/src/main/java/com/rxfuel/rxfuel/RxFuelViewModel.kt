@@ -7,15 +7,57 @@ import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 
 /**
- * Created by salah on 23/1/18.
+ * Creates an Observable of ViewState by merging all events including initial events if any.
+ *
+ * @param E the type of Event in this context.
+ * @param A the type of Action in this context.
+ * @param R the type of Result in this context.
+ * @param VS the type of RxFuelViewState in this context.
+ * @constructor Creates ViewModel instance with processor.
+ * @author Salah (nh.salah@gmail.com)
  */
-
 abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuelResult,  VS : RxFuelViewState>(private val processor : RxFuelProcessor<A,R>?) : ViewModel() {
 
+    /**
+     * Empty constructor to use in case no processor
+     */
     constructor() : this(null)
 
+    /**
+     * Idle state is rendered initially.
+     */
     abstract var idleState : VS
+
+    /**
+     * Initial event is invoked upon ViewModel binding if not null.
+     * Also used to set initial event during activity navigation internally.
+     */
     var initialEvent : E? = null
+
+    /**
+     * Maps event to result for local(synchronous) events.
+     *
+     * @param event local event to be converted to result
+     * @return result of event
+     */
+    abstract fun eventToResult(event: E) : R
+
+    /**
+     * Maps event to action for processable(asynchronous) events.
+     *
+     * @param event event to be converted to an action
+     * @return action to the corresponding event
+     */
+    abstract fun eventToAction(event: E) : A
+
+    /**
+     * Maps result to ViewState to render the UI.
+     *
+     * @param previousState last rendered ViewState
+     * @param result result data to create new ViewState.
+     * @return new ViewState.
+     */
+    abstract fun resultToViewState(previousState: VS, result: R) : VS
 
     private val eventsSubject: PublishSubject<E> = PublishSubject.create()
     private val initialEventSubject: PublishSubject<E> = PublishSubject.create()
@@ -35,18 +77,18 @@ abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuel
         val mainObservable =
                 if(processor!=null)
                     Observable.merge(
-                        eventsSubject
-                                .filter{ event -> !event.isLocal }
-                                .map(this::eventToAction)
-                                .compose(processor.process()),
-                        eventsSubject
-                                .filter{ event -> event.isLocal}
-                                .map(this::eventToResult)
+                            eventsSubject
+                                    .filter{ event -> !event.isLocal }
+                                    .map(this::eventToAction)
+                                    .compose(processor.process()),
+                            eventsSubject
+                                    .filter{ event -> event.isLocal}
+                                    .map(this::eventToResult)
                     )
                 else
                     eventsSubject
-                        .filter{ event -> event.isLocal}
-                        .map(this::eventToResult)
+                            .filter{ event -> event.isLocal}
+                            .map(this::eventToResult)
 
         return mainObservable
                 .scan(idleState, reducer())
@@ -62,21 +104,10 @@ abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuel
                 .autoConnect(0)
     }
 
-    abstract fun eventToResult(event: E) : R
-
-    abstract fun eventToAction(event: E) : A
-
     private fun reducer(): BiFunction<VS, R, VS> {
         return BiFunction { previousState: VS, result: R ->
             resultToViewState(previousState,result)
         }
-    }
-
-    abstract fun resultToViewState(previousState: VS, result: R) : VS
-
-    override fun onCleared() {
-        super.onCleared()
-
     }
 
 }

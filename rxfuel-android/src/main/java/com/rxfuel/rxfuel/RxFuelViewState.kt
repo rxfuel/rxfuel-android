@@ -4,9 +4,13 @@ import android.support.v4.app.FragmentActivity
 import kotlin.reflect.KClass
 
 /**
- * Created by salah on 23/1/18.
+ * Interface to implement ViewState. ViewState ares used to render the UI.
+ * Implementation should override property [navigate]. Set it null by default.
+ * Change the value of [navigate] to destination activity class to handle navigation.
+ * A new ViewState will be trigger with [navigate] = null immediately after rendering the ViewState with navigation.
+ *
+ * @author Salah (nh.salah@gmail.com)
  */
-
 interface RxFuelViewState {
     var navigate : KClass<out FragmentActivity>?
 }

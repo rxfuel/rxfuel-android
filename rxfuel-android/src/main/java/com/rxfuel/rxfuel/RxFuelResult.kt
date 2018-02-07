@@ -1,7 +1,8 @@
 package com.rxfuel.rxfuel
 
 /**
- * Created by salah on 23/1/18.
+ * Interface to implement Result. Result classes are holder of result data of processes.
+ *
+ * @author Salah (nh.salah@gmail.com)
  */
-
 interface RxFuelResult

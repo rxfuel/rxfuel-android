@@ -19,9 +19,9 @@ if (project.hasProperty("android")) {
     }
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
+task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
     classifier = 'javadoc'
-    from javadoc.destinationDir
+    from dokkaJavadoc.outputDirectory
 }
 
 artifacts {
