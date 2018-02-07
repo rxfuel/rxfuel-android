@@ -17,4 +17,5 @@ sealed class RepoListResult : RxFuelResult {
         data class Failure(val errorMessage : String) : SearchResult()
     }
 
+    data class RepoClickResult(val repo : Repo) : RepoListResult()
 }

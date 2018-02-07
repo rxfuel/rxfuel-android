@@ -3,6 +3,7 @@ package com.rxfuel.rxfuel
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.support.v4.app.FragmentActivity
+import android.util.Log
 import io.reactivex.subjects.BehaviorSubject
 import kotlin.reflect.KClass
 
@@ -24,7 +25,6 @@ object RxFuel {
         val viewModel : VM = getPersistedViewModel(context,newViewModel)
 
         initialEventSubject
-                .take(1)
                 .filter { it is E }
                 .subscribe {
                     viewModel.initialEvent = it as E
@@ -37,6 +37,10 @@ object RxFuel {
 
     inline fun <reified E : RxFuelEvent> navigateTo(context: FragmentActivity,dest : KClass<out FragmentActivity>, initialEvent: E){
         initialEventSubject.onNext(initialEvent)
+        context.startActivity(Intent(context,dest.java))
+    }
+
+    fun navigateTo(context: FragmentActivity,dest : KClass<out FragmentActivity>){
         context.startActivity(Intent(context,dest.java))
     }
 

@@ -13,16 +13,11 @@ class RepoListViewModel @Inject constructor(mainProcessor : RepoListProcessor) :
         get() = RepoListViewState.idle()
         set(value) {}
 
-    override var initialEvent: RepoListEvent? = null
-        get() = field
-        set(value) { field = value}
-
-    override var isInitialEventLocal: Boolean
-        get() = true
-        set(value) {}
-
     override fun eventToResult(event: RepoListEvent): RepoListResult {
-        return RepoListResult.InitialResult
+        return when(event){
+            is RepoListEvent.RepoClick -> RepoListResult.RepoClickResult(event.repo)
+            else -> RepoListResult.InitialResult
+        }
     }
 
     override fun eventToAction(event: RepoListEvent): RepoListAction {
@@ -34,9 +29,10 @@ class RepoListViewModel @Inject constructor(mainProcessor : RepoListProcessor) :
 
     override fun resultToViewState(previousState: RepoListViewState, result: RepoListResult): RepoListViewState {
         return when(result) {
-            is RepoListResult.SearchResult.Success -> previousState.copy(repos = result.repos, loading = false)
-            RepoListResult.SearchResult.InFlight -> previousState.copy(loading = true)
-            is RepoListResult.SearchResult.Failure -> previousState.copy(errorMessage = result.errorMessage, loading = false)
+            is RepoListResult.SearchResult.Success -> previousState.copy(repos = result.repos, loading = false, hideKeyboard = false)
+            RepoListResult.SearchResult.InFlight -> previousState.copy(loading = true, hideKeyboard = true)
+            is RepoListResult.SearchResult.Failure -> previousState.copy(errorMessage = result.errorMessage, loading = false, hideKeyboard = false)
+            is RepoListResult.RepoClickResult -> previousState.copy(navigate = RepoListActivity::class, lastClickedRepo = result.repo)
             else -> idleState
         }
     }

@@ -1,6 +1,5 @@
 package com.rxfuel.rxfuelsample.ui.repoList
 
-import android.util.Log
 import com.rxfuel.rxfuelsample.di.DaggerTestComponent
 import io.reactivex.observers.TestObserver
 import org.junit.Before
@@ -11,6 +10,7 @@ import io.reactivex.plugins.RxJavaPlugins
 import org.junit.Test
 import javax.inject.Inject
 import io.reactivex.schedulers.Schedulers
+import org.junit.After
 
 /**
  * Created by salah on 3/2/18.
@@ -18,7 +18,7 @@ import io.reactivex.schedulers.Schedulers
 
 class RepoListViewModelTest {
 
-    lateinit var repoListViewModel: RepoListViewModel
+    lateinit var repoListViewModel: DetailViewModel
 
     lateinit var testObserver: TestObserver<RepoListViewState>
 
@@ -35,7 +35,7 @@ class RepoListViewModelTest {
 
         component.inject(this)
 
-        repoListViewModel = RepoListViewModel(RepoListProcessor(githubApi))
+        repoListViewModel = DetailViewModel(RepoListProcessor(githubApi))
 
         testObserver = repoListViewModel.states().test()
 
@@ -44,8 +44,8 @@ class RepoListViewModelTest {
     @Test
     fun testRepoList() {
         repoListViewModel.processEvents(Observable.just(
-                RepoListEvent.Search("retrofit")
-        ),null)
+                DetailEvent.Search("retrofit")
+        ))
 
         testObserver.assertValueAt(2,
                 { state ->
@@ -56,5 +56,11 @@ class RepoListViewModelTest {
         )
 
         testObserver.assertNoErrors()
+    }
+
+    @After
+    fun After(){
+        RxAndroidPlugins.reset()
+        RxJavaPlugins.reset()
     }
 }
