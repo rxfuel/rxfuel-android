@@ -12,7 +12,7 @@ import kotlin.reflect.KClass
 
 object RxFuel {
 
-    val initialStateSubject : BehaviorSubject<RxFuelEvent> = BehaviorSubject.create<RxFuelEvent>()
+    val initialEventSubject : BehaviorSubject<RxFuelEvent> = BehaviorSubject.create<RxFuelEvent>()
 
     @Suppress("UNCHECKED_CAST")
     inline fun <reified E : RxFuelEvent,A : RxFuelAction,R : RxFuelResult, VS : RxFuelViewState,V : RxFuelView<E,VS>,VM :
@@ -23,9 +23,12 @@ object RxFuel {
         val rxFuelView : V = context as V
         val viewModel : VM = getPersistedViewModel(context,newViewModel)
 
-        initialStateSubject.take(1).filter { it is E }.subscribe {
-                viewModel.initialEvent = it as E
-        }
+        initialEventSubject
+                .take(1)
+                .filter { it is E }
+                .subscribe {
+                    viewModel.initialEvent = it as E
+                }
 
         viewModel.states().subscribe ({viewState -> rxFuelView.render(viewState)}){ t -> throw t}
         viewModel.processEvents(if(rxFuelView.events()!=null) rxFuelView.events() else null)
@@ -33,7 +36,7 @@ object RxFuel {
     }
 
     inline fun <reified E : RxFuelEvent> navigateTo(context: FragmentActivity,dest : KClass<out FragmentActivity>, initialEvent: E){
-        initialStateSubject.onNext(initialEvent)
+        initialEventSubject.onNext(initialEvent)
         context.startActivity(Intent(context,dest.java))
     }
 
