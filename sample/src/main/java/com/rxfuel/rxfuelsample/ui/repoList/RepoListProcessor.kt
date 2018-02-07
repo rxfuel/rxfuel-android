@@ -11,10 +11,7 @@ import javax.inject.Inject
  * Created by salah on 2/2/18.
  */
 
-class RepoListProcessor @Inject constructor() : RxFuelProcessor<RepoListAction, RepoListResult>() {
-
-    @Inject
-    lateinit var githubApi : GithubApi
+class RepoListProcessor @Inject constructor(var githubApi : GithubApi) : RxFuelProcessor<RepoListAction, RepoListResult>() {
 
     override val processors: HashMap<Class<out RepoListAction>, ObservableTransformer<out RepoListAction, out RepoListResult>>
         get() = hashMapOf(
@@ -26,7 +23,7 @@ class RepoListProcessor @Inject constructor() : RxFuelProcessor<RepoListAction, 
                 actions.flatMap { action ->
                     githubApi.getRepositories(action.query)
                             .subscribeOn(Schedulers.io())
-                            .map{ response -> RepoListResult.SearchResult.Success(response.items) as RepoListResult.SearchResult }
+                            .map { response -> RepoListResult.SearchResult.Success(response.items) as RepoListResult.SearchResult }
                             .onErrorReturn { t -> RepoListResult.SearchResult.Failure(t.toString()) }
                             .observeOn(AndroidSchedulers.mainThread())
                             .startWith(RepoListResult.SearchResult.InFlight)

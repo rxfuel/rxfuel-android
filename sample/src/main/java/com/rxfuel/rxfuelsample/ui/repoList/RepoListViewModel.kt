@@ -13,7 +13,7 @@ class RepoListViewModel @Inject constructor(mainProcessor : RepoListProcessor) :
         get() = RepoListViewState.idle()
         set(value) {}
 
-    override var initialEvent: RepoListEvent = RepoListEvent.InitialEvent
+    override var initialEvent: RepoListEvent? = null
         get() = field
         set(value) { field = value}
 

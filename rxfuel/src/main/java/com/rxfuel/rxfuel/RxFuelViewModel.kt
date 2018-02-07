@@ -15,32 +15,38 @@ import java.util.concurrent.TimeUnit
 abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuelResult,  VS : RxFuelViewState>(private val processor : RxFuelProcessor<A,R>) : ViewModel() {
 
     abstract var idleState : VS
-    abstract var initialEvent : E
+    abstract var initialEvent : E?
     abstract var isInitialEventLocal : Boolean
 
     private val eventsSubject: PublishSubject<E> = PublishSubject.create()
     private val localEventsSubject: PublishSubject<E> = PublishSubject.create()
-    private val statesObservable: Observable<out VS> = compose()
+    private val statesObservable: Observable<VS> = compose()
 
     fun processEvents(events: Observable<E>?, localEvents : Observable<E>?) {
-        if(isInitialEventLocal) {
-            if(localEvents!=null)
-                Observable.merge(Observable.just(initialEvent),localEvents).subscribe(localEventsSubject)
-            else
-                Observable.just(initialEvent).subscribe(localEventsSubject)
+
+        if(initialEvent!=null){
+            if(isInitialEventLocal) {
+                if(localEvents!=null)
+                    Observable.merge(Observable.just(initialEvent),localEvents).subscribe(localEventsSubject)
+                else
+                    Observable.just(initialEvent).subscribe(localEventsSubject)
+                events?.subscribe(eventsSubject)
+            } else {
+                if(events!=null)
+                    Observable.merge(Observable.just(initialEvent),events).subscribe(eventsSubject)
+                else
+                    Observable.just(initialEvent).subscribe(eventsSubject)
+                localEvents?.subscribe(localEventsSubject)
+            }
+        }else{
             events?.subscribe(eventsSubject)
-        } else {
-            if(events!=null)
-                Observable.merge(Observable.just(initialEvent),events).subscribe(eventsSubject)
-            else
-                Observable.just(initialEvent).subscribe(eventsSubject)
             localEvents?.subscribe(localEventsSubject)
         }
     }
 
-    fun states(): Observable<out VS> = statesObservable
+    fun states(): Observable<VS> = statesObservable
 
-    private fun compose(): Observable<out VS> {
+    private fun compose(): Observable<VS> {
         return Observable.merge(
                     eventsSubject
                         .map(this::eventToAction)

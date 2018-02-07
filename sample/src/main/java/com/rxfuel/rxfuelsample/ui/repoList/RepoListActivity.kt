@@ -40,22 +40,16 @@ class RepoListActivity : DaggerAppCompatActivity(), RxFuelView<RepoListEvent, Re
 
     override fun events(): Observable<RepoListEvent>? {
         return et_query.textChanges()
-                .filter { q -> q.length > 3 }
+                .filter { it.length > 3 }
                 .debounce(1,TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .map { query -> RepoListEvent.Search(query.toString()) }
     }
 
     override fun render(state: RepoListViewState) {
         progressBar.visibility = if(state.loading) VISIBLE else GONE
-
         rv_repos.visibility = if(state.loading || state.repos.isEmpty()) GONE else VISIBLE
-
-        if(!state.loading){
-            reposSubject.onNext(state.repos)
-        }
-        if(state.errorMessage!=null){
-            Toast.makeText(this,state.errorMessage,LENGTH_LONG).show()
-        }
+        if(!state.loading) reposSubject.onNext(state.repos)
+        if(state.errorMessage!=null) Toast.makeText(this,state.errorMessage,LENGTH_LONG).show()
     }
 
 }
