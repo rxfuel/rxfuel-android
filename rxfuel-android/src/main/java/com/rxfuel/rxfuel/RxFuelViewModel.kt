@@ -1,7 +1,6 @@
 package com.rxfuel.rxfuel
 
 import android.arch.lifecycle.ViewModel
-import android.util.Log
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import io.reactivex.subjects.PublishSubject
