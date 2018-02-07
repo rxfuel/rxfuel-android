@@ -1,6 +1,8 @@
 package com.rxfuel.rxfuelsample.ui.repoList
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
@@ -17,6 +19,8 @@ import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import android.view.inputmethod.InputMethodManager
+
 
 class RepoListActivity : DaggerAppCompatActivity(), RxFuelView<RepoListEvent, RepoListViewState> {
 
@@ -36,16 +40,27 @@ class RepoListActivity : DaggerAppCompatActivity(), RxFuelView<RepoListEvent, Re
 
     override fun events(): Observable<RepoListEvent>? {
         return et_query.textChanges()
-                .filter { it.length > 3 }
                 .debounce(1,TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                .filter { it.length > 3 }
                 .map { query -> RepoListEvent.Search(query.toString()) }
     }
 
     override fun render(state: RepoListViewState) {
+
+        Log.d("RepoState",state.toString())
+
         progressBar.visibility = if(state.loading) VISIBLE else GONE
         rv_repos.visibility = if(state.loading || state.repos.isEmpty()) GONE else VISIBLE
         if(!state.loading) reposSubject.onNext(state.repos)
+        if(state.hideKeyboard) hideKeyboard()
         if(state.errorMessage!=null) Toast.makeText(this,state.errorMessage,LENGTH_LONG).show()
+    }
+
+    private fun hideKeyboard(){
+        if (et_query != null) {
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(et_query.windowToken, 0)
+        }
     }
 
 }

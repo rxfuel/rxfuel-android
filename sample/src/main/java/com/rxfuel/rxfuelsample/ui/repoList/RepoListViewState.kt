@@ -13,9 +13,11 @@ import kotlin.reflect.KClass
 data class RepoListViewState(val loading : Boolean,
                              val repos : List<Repo>,
                              val errorMessage : String? = null,
+                             val hideKeyboard : Boolean = false,
                              override var navigate: KClass<out FragmentActivity>? = null) : RxFuelViewState {
 
     companion object {
         fun idle() = RepoListViewState(false, Arrays.asList())
     }
+
 }

@@ -11,6 +11,7 @@ import io.reactivex.plugins.RxJavaPlugins
 import org.junit.Test
 import javax.inject.Inject
 import io.reactivex.schedulers.Schedulers
+import org.junit.After
 
 /**
  * Created by salah on 3/2/18.
@@ -45,7 +46,7 @@ class RepoListViewModelTest {
     fun testRepoList() {
         repoListViewModel.processEvents(Observable.just(
                 RepoListEvent.Search("retrofit")
-        ),null)
+        ))
 
         testObserver.assertValueAt(2,
                 { state ->
@@ -56,5 +57,11 @@ class RepoListViewModelTest {
         )
 
         testObserver.assertNoErrors()
+    }
+
+    @After
+    fun After(){
+        RxAndroidPlugins.reset()
+        RxJavaPlugins.reset()
     }
 }

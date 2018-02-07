@@ -34,9 +34,9 @@ class RepoListViewModel @Inject constructor(mainProcessor : RepoListProcessor) :
 
     override fun resultToViewState(previousState: RepoListViewState, result: RepoListResult): RepoListViewState {
         return when(result) {
-            is RepoListResult.SearchResult.Success -> previousState.copy(repos = result.repos, loading = false)
-            RepoListResult.SearchResult.InFlight -> previousState.copy(loading = true)
-            is RepoListResult.SearchResult.Failure -> previousState.copy(errorMessage = result.errorMessage, loading = false)
+            is RepoListResult.SearchResult.Success -> previousState.copy(repos = result.repos, loading = false, hideKeyboard = false)
+            RepoListResult.SearchResult.InFlight -> previousState.copy(loading = true, hideKeyboard = true)
+            is RepoListResult.SearchResult.Failure -> previousState.copy(errorMessage = result.errorMessage, loading = false, hideKeyboard = false)
             else -> idleState
         }
     }

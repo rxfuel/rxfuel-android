@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/RxFuel.iml" filepath="$PROJECT_DIR$/RxFuel.iml" />
-      <module fileurl="file://$PROJECT_DIR$/rxfuel/rxfuel.iml" filepath="$PROJECT_DIR$/rxfuel/rxfuel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rxfuel-android/rxfuel.iml" filepath="$PROJECT_DIR$/rxfuel-android/rxfuel.iml" />
       <module fileurl="file://$PROJECT_DIR$/sample/sample.iml" filepath="$PROJECT_DIR$/sample/sample.iml" />
     </modules>
   </component>
