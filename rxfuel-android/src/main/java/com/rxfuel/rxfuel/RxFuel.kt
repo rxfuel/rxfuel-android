@@ -3,7 +3,7 @@ package com.rxfuel.rxfuel
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.support.v4.app.FragmentActivity
-import android.util.Log
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import kotlin.reflect.KClass
 
@@ -11,31 +11,33 @@ import kotlin.reflect.KClass
  * Created by salah on 29/1/18.
  */
 
-object RxFuel {
+class RxFuel(val context: FragmentActivity) {
 
-    val initialEventSubject : BehaviorSubject<RxFuelEvent> = BehaviorSubject.create<RxFuelEvent>()
+    var disposables = CompositeDisposable()
 
     @Suppress("UNCHECKED_CAST")
     inline fun <reified E : RxFuelEvent,A : RxFuelAction,R : RxFuelResult, VS : RxFuelViewState,V : RxFuelView<E,VS>,VM :
-    RxFuelViewModel<E,A,R,VS>> bind(context: FragmentActivity,newViewModel : VM){
+    RxFuelViewModel<E,A,R,VS>> bind(viewModel : VM) {
 
-        ViewModelFactory.instance.registerViewModel(newViewModel)
+        ViewModelFactory.instance.registerViewModel(viewModel)
 
         val rxFuelView : V = context as V
-        val viewModel : VM = getPersistedViewModel(context,newViewModel)
+        val persistedViewModel : VM = getPersistedViewModel(viewModel)
 
         initialEventSubject
                 .filter { it is E }
-                .subscribe {
-                    viewModel.initialEvent = it as E
-                }
+                .subscribe { persistedViewModel.initialEvent = it as E }
 
-        viewModel.states().subscribe ({viewState -> rxFuelView.render(viewState)}){ t -> throw t}
-        viewModel.processEvents(if(rxFuelView.events()!=null) rxFuelView.events() else null)
+        disposables.add(persistedViewModel.states().subscribe ({viewState -> rxFuelView.render(viewState)}){ t -> throw t})
+        persistedViewModel.processEvents(if(rxFuelView.events()!=null) rxFuelView.events() else null)
 
     }
 
-    inline fun <reified E : RxFuelEvent> navigateTo(context: FragmentActivity,dest : KClass<out FragmentActivity>, initialEvent: E){
+    fun unbind(){
+        disposables.dispose()
+    }
+
+    inline fun <reified E : RxFuelEvent> navigateTo(dest : KClass<out FragmentActivity>, initialEvent: E){
         initialEventSubject.onNext(initialEvent)
         context.startActivity(Intent(context,dest.java))
     }
@@ -45,10 +47,14 @@ object RxFuel {
     }
 
     inline fun <reified E : RxFuelEvent,A : RxFuelAction,R : RxFuelResult, VS : RxFuelViewState,VM :
-    RxFuelViewModel<E,A,R,VS>> getPersistedViewModel(context: FragmentActivity, viewModel: VM) : VM {
+    RxFuelViewModel<E,A,R,VS>> getPersistedViewModel(viewModel: VM) : VM {
         return ViewModelProviders
                 .of(context, ViewModelFactory.instance)
                 .get(viewModel.javaClass)
+    }
+
+    companion object {
+        val initialEventSubject : BehaviorSubject<RxFuelEvent> = BehaviorSubject.create<RxFuelEvent>()
     }
 
 }

@@ -11,13 +11,15 @@ import javax.inject.Inject
 
 class DetailActivity : DaggerAppCompatActivity(), RxFuelView<DetailEvent,DetailViewState> {
 
+    val rxFuel : RxFuel = RxFuel(this)
+
     @Inject
     lateinit var viewModel: DetailViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_repo_detail)
-        RxFuel.bind(this,viewModel)
+        rxFuel.bind(viewModel)
     }
 
     override fun events(): Observable<DetailEvent>? = null
