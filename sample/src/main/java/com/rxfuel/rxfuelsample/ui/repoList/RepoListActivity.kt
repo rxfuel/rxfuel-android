@@ -20,40 +20,45 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import android.view.inputmethod.InputMethodManager
-
+import com.rxfuel.rxfuelsample.ui.detail.DetailActivity
+import com.rxfuel.rxfuelsample.ui.detail.DetailEvent
 
 class RepoListActivity : DaggerAppCompatActivity(), RxFuelView<RepoListEvent, RepoListViewState> {
 
     @Inject
     lateinit var repoListViewModel : RepoListViewModel
-
     private val reposSubject: PublishSubject<List<Repo>> = PublishSubject.create()
+    private val reposAdapter = RepoListAdapter(reposSubject)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        rv_repos.adapter = RepoListAdapter(reposSubject)
-
+        rv_repos.adapter = reposAdapter
         RxFuel.bind(this,repoListViewModel)
     }
 
     override fun events(): Observable<RepoListEvent>? {
-        return et_query.textChanges()
-                .debounce(1,TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                .filter { it.length > 3 }
-                .map { query -> RepoListEvent.Search(query.toString()) }
+        return Observable.merge(
+                et_query.textChanges()
+                        .debounce(1,TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                        .filter { it.length > 3 }
+                        .map { query -> RepoListEvent.Search(query.toString()) },
+                reposAdapter.itemClicks()
+                        .map { repo -> RepoListEvent.RepoClick(repo) }
+                )
     }
 
     override fun render(state: RepoListViewState) {
-
-        Log.d("RepoState",state.toString())
-
         progressBar.visibility = if(state.loading) VISIBLE else GONE
         rv_repos.visibility = if(state.loading || state.repos.isEmpty()) GONE else VISIBLE
         if(!state.loading) reposSubject.onNext(state.repos)
         if(state.hideKeyboard) hideKeyboard()
         if(state.errorMessage!=null) Toast.makeText(this,state.errorMessage,LENGTH_LONG).show()
+        if(state.navigate!=null) {
+            when(state.navigate){
+                RepoListActivity::class -> RxFuel.navigateTo(this, DetailActivity::class, DetailEvent.DisplayRepoEvent(state.lastClickedRepo!!))
+            }
+        }
     }
 
     private fun hideKeyboard(){
