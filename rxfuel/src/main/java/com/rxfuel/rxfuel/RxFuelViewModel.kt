@@ -19,28 +19,13 @@ abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuel
     abstract var isInitialEventLocal : Boolean
 
     private val eventsSubject: PublishSubject<E> = PublishSubject.create()
-    private val localEventsSubject: PublishSubject<E> = PublishSubject.create()
     private val statesObservable: Observable<VS> = compose()
 
-    fun processEvents(events: Observable<E>?, localEvents : Observable<E>?) {
-
-        if(initialEvent!=null){
-            if(isInitialEventLocal) {
-                if(localEvents!=null)
-                    Observable.merge(Observable.just(initialEvent),localEvents).subscribe(localEventsSubject)
-                else
-                    Observable.just(initialEvent).subscribe(localEventsSubject)
-                events?.subscribe(eventsSubject)
-            } else {
-                if(events!=null)
-                    Observable.merge(Observable.just(initialEvent),events).subscribe(eventsSubject)
-                else
-                    Observable.just(initialEvent).subscribe(eventsSubject)
-                localEvents?.subscribe(localEventsSubject)
-            }
+    fun processEvents(events: Observable<E>?) {
+        if(initialEvent!=null) {
+            Observable.merge(Observable.just(initialEvent),events).subscribe(eventsSubject)
         }else{
             events?.subscribe(eventsSubject)
-            localEvents?.subscribe(localEventsSubject)
         }
     }
 
@@ -49,9 +34,11 @@ abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuel
     private fun compose(): Observable<VS> {
         return Observable.merge(
                     eventsSubject
+                        .filter{ event -> !event.isLocal }
                         .map(this::eventToAction)
                         .compose(processor.process()),
-                    localEventsSubject
+                    eventsSubject
+                        .filter{ event -> event.isLocal}
                         .map(this::eventToResult)
                 )
                 .scan(idleState, reducer())

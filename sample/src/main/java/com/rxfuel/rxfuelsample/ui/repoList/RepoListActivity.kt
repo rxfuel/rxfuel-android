@@ -34,10 +34,6 @@ class RepoListActivity : DaggerAppCompatActivity(), RxFuelView<RepoListEvent, Re
         RxFuel.bind(this,repoListViewModel)
     }
 
-    override fun localEvents(): Observable<RepoListEvent>? {
-        return null
-    }
-
     override fun events(): Observable<RepoListEvent>? {
         return et_query.textChanges()
                 .filter { it.length > 3 }

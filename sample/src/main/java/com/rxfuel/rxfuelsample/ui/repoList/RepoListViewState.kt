@@ -14,6 +14,7 @@ data class RepoListViewState(val loading : Boolean,
                              val repos : List<Repo>,
                              val errorMessage : String? = null,
                              override var navigate: KClass<out FragmentActivity>? = null) : RxFuelViewState {
+
     companion object {
         fun idle() = RepoListViewState(false, Arrays.asList())
     }

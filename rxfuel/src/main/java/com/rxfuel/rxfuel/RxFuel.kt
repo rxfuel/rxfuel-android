@@ -3,8 +3,6 @@ package com.rxfuel.rxfuel
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.support.v4.app.FragmentActivity
-import android.util.Log
-import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import kotlin.reflect.KClass
 
@@ -30,10 +28,7 @@ object RxFuel {
         }
 
         viewModel.states().subscribe ({viewState -> rxFuelView.render(viewState)}){ t -> throw t}
-        viewModel.processEvents(
-                if(rxFuelView.events()!=null) rxFuelView.events() else null,
-                if(rxFuelView.localEvents()!=null) rxFuelView.localEvents() else null
-        )
+        viewModel.processEvents(if(rxFuelView.events()!=null) rxFuelView.events() else null)
 
     }
 

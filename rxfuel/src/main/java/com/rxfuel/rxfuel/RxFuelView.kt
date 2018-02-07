@@ -7,7 +7,6 @@ import io.reactivex.Observable
  */
 
 interface RxFuelView<E : RxFuelEvent, in VS : RxFuelViewState> {
-    fun localEvents(): Observable<E>?
     fun events(): Observable<E>?
     fun render(state: VS)
 }
