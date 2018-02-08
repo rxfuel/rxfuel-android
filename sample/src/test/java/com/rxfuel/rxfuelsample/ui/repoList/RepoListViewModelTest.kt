@@ -12,13 +12,9 @@ import javax.inject.Inject
 import io.reactivex.schedulers.Schedulers
 import org.junit.After
 
-/**
- * Created by salah on 3/2/18.
- */
-
 class RepoListViewModelTest {
 
-    lateinit var repoListViewModel: DetailViewModel
+    lateinit var repoListViewModel: RepoListViewModel
 
     lateinit var testObserver: TestObserver<RepoListViewState>
 
@@ -35,7 +31,7 @@ class RepoListViewModelTest {
 
         component.inject(this)
 
-        repoListViewModel = DetailViewModel(RepoListProcessor(githubApi))
+        repoListViewModel = RepoListViewModel(RepoListProcessor(githubApi))
 
         testObserver = repoListViewModel.states().test()
 
@@ -44,7 +40,7 @@ class RepoListViewModelTest {
     @Test
     fun testRepoList() {
         repoListViewModel.processEvents(Observable.just(
-                DetailEvent.Search("retrofit")
+                RepoListEvent.Search("retrofit")
         ))
 
         testObserver.assertValueAt(2,

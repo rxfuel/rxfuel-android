@@ -4,7 +4,7 @@ import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
 
 /**
- * Merges all processors into single Observable stream.
+ * Merges all processors into single [Observable] stream.
  * Create Processor class inheriting this.
  *
  * @param A the type of Action in this context.
@@ -14,7 +14,7 @@ import io.reactivex.ObservableTransformer
 abstract class RxFuelProcessor<A : RxFuelAction, R : RxFuelResult> {
 
     /**
-     * Hashmap of all Actions paired with it's processor.
+     * [HashMap] of all Actions paired with it's processor.
      */
     abstract val processors : HashMap<Class<out A>,ObservableTransformer<out A,out R>>
 

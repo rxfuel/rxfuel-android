@@ -11,7 +11,7 @@ import java.util.HashMap
  *
  * @author Salah (nh.salah@gmail.com)
  */
-class ViewModelFactory : ViewModelProvider.Factory {
+open class ViewModelFactory : ViewModelProvider.Factory {
 
     private val viewModelHashMap = HashMap<Class<out ViewModel>, ViewModel>()
 
