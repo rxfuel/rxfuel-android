@@ -1,9 +1,7 @@
 package com.rxfuel.rxfuel
 
 import android.arch.lifecycle.ViewModel
-import android.util.Log
 import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
@@ -111,8 +109,4 @@ abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuel
     private fun reducer(): BiFunction<VS, R, VS>
             = BiFunction { previousState: VS, result: R -> resultToViewState(previousState,result) }
 
-    override fun onCleared() {
-        super.onCleared()
-        Log.d("RxFuelViewModel","on cleared")
-    }
 }

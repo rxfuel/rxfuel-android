@@ -88,6 +88,9 @@ class RxFuel(val context: FragmentActivity) {
         context.startActivity(Intent(context, dest.java))
     }
 
+    /**
+     * Provides ViewModelFactory instance
+     */
     fun getViewModeFactory() = ViewModelFactory.instance
 
     companion object {

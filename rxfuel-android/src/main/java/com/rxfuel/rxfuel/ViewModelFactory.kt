@@ -13,14 +13,23 @@ import java.util.HashMap
  */
 open class ViewModelFactory : ViewModelProvider.Factory {
 
+    /**
+     * [HashMap] of all ViewModel class paired with ViewModel instance
+     */
     private val viewModelHashMap = HashMap<Class<out ViewModel>, ViewModel>()
 
+    /**
+     * Adds ViewModel to [viewModelHashMap]
+     */
     fun registerViewModel(viewModel: ViewModel) {
         if (!viewModelHashMap.containsKey(viewModel.javaClass)) {
             viewModelHashMap[viewModel.javaClass] = viewModel
         }
     }
 
+    /**
+     * Provides persisted ViewModel
+     */
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         for ((key, value) in viewModelHashMap) {
