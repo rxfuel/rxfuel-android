@@ -53,8 +53,8 @@ ext {
 task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
     outputFormat = 'html'
     outputDirectory = "$buildDir/javadoc"
+    sourceDirs = files('src/main/java')
 }
-
 
 dependencies {
 
