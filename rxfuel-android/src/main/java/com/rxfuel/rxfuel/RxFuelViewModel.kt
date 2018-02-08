@@ -4,7 +4,6 @@ import android.arch.lifecycle.ViewModel
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import io.reactivex.subjects.PublishSubject
-import java.util.concurrent.TimeUnit
 
 /**
  * Creates an Observable of ViewState by merging all events including initial events if any.
@@ -16,7 +15,8 @@ import java.util.concurrent.TimeUnit
  * @constructor Creates ViewModel instance with processor.
  * @author Salah (nh.salah@gmail.com)
  */
-abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuelResult,  VS : RxFuelViewState>(private val processor : RxFuelProcessor<A,R>?) : ViewModel() {
+abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuelResult,
+        VS : RxFuelViewState>(private val processor : RxFuelProcessor<A,R>?) : ViewModel() {
 
     /**
      * Empty constructor to use in case no processor
@@ -30,7 +30,7 @@ abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuel
 
     /**
      * Initial event is invoked upon ViewModel binding if not null.
-     * Also used to set initial event during activity navigation internally.
+     * Also used internally to set initial event during activity navigation.
      */
     var initialEvent : E? = null
 
@@ -60,20 +60,21 @@ abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuel
     abstract fun resultToViewState(previousState: VS, result: R) : VS
 
     private val eventsSubject: PublishSubject<E> = PublishSubject.create()
-    private val initialEventSubject: PublishSubject<E> = PublishSubject.create()
     private val statesObservable: Observable<VS> = compose()
 
     fun states(): Observable<VS> = statesObservable
 
     fun processEvents(events: Observable<E>?) {
-        if(events!=null)
-            Observable.merge(initialEventSubject, events).subscribe(eventsSubject)
-        else
-            initialEventSubject.subscribe(eventsSubject)
-        if(initialEvent!=null) initialEventSubject.onNext(initialEvent!!)
+        if(events!=null && initialEvent!=null)
+            events.startWith(initialEvent).subscribe(eventsSubject)
+        else if (events==null && initialEvent!=null)
+            eventsSubject.onNext(initialEvent!!)
+        else if (events!=null && initialEvent==null)
+            events.subscribe(eventsSubject)
     }
 
     private fun compose(): Observable<VS> {
+
         val mainObservable =
                 if(processor!=null)
                     Observable.merge(
@@ -92,11 +93,13 @@ abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuel
 
         return mainObservable
                 .scan(idleState, reducer())
-                .flatMap {state ->
+                .flatMap { state ->
                     if(state.navigate!=null) {
-                        Observable.just(1, TimeUnit.MICROSECONDS)
-                                .map { state.apply { navigate = null } }
+                        Observable.just(state)
                                 .startWith(state)
+                                .doAfterNext {
+                                    state.apply { navigate = null }
+                                }
                     } else
                         Observable.just(state)
                 }
@@ -104,10 +107,7 @@ abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuel
                 .autoConnect(0)
     }
 
-    private fun reducer(): BiFunction<VS, R, VS> {
-        return BiFunction { previousState: VS, result: R ->
-            resultToViewState(previousState,result)
-        }
-    }
+    private fun reducer(): BiFunction<VS, R, VS>
+            = BiFunction { previousState: VS, result: R -> resultToViewState(previousState,result) }
 
 }

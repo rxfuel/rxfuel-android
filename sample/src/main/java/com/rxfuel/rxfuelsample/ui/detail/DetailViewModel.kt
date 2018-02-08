@@ -1,12 +1,7 @@
 package com.rxfuel.rxfuelsample.ui.detail
 
-import android.util.Log
 import com.rxfuel.rxfuel.RxFuelViewModel
 import javax.inject.Inject
-
-/**
- * Created by salah on 2/2/18.
- */
 
 class DetailViewModel @Inject constructor() : RxFuelViewModel<DetailEvent, DetailAction, DetailResult, DetailViewState>() {
 
@@ -30,8 +25,4 @@ class DetailViewModel @Inject constructor() : RxFuelViewModel<DetailEvent, Detai
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        Log.d("DetailViewModel", "cleared")
-    }
 }

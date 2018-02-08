@@ -4,7 +4,7 @@ import android.support.v4.app.FragmentActivity
 import kotlin.reflect.KClass
 
 /**
- * Interface to implement ViewState. ViewState ares used to render the UI.
+ * Interface to implement ViewState. ViewState are used to render the UI.
  *
  * @author Salah (nh.salah@gmail.com)
  */

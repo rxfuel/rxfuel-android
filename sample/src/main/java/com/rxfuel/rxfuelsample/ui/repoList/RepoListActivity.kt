@@ -2,6 +2,7 @@ package com.rxfuel.rxfuelsample.ui.repoList
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
@@ -49,6 +50,7 @@ class RepoListActivity : DaggerAppCompatActivity(), RxFuelView<RepoListEvent, Re
         return Observable.merge(
                 et_query.textChanges()
                         .debounce(1,TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                        .skip(1)
                         .filter { it.length > 3 }
                         .map { query -> RepoListEvent.Search(query.toString()) },
                 reposAdapter.itemClicks()
@@ -57,6 +59,7 @@ class RepoListActivity : DaggerAppCompatActivity(), RxFuelView<RepoListEvent, Re
     }
 
     override fun render(state: RepoListViewState) {
+        Log.d("RepoListActivity",state.navigate.toString())
         progressBar.visibility = if(state.loading) VISIBLE else GONE
         rv_repos.visibility = if(state.loading || state.repos.isEmpty()) GONE else VISIBLE
         if(!state.loading) reposSubject.onNext(state.repos)
