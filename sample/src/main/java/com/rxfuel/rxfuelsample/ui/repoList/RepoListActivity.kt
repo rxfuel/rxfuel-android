@@ -69,11 +69,10 @@ class RepoListActivity : DaggerAppCompatActivity(), RxFuelView<RepoListEvent, Re
         }
     }
 
-    private fun hideKeyboard(){
+    private fun hideKeyboard() {
         if (et_query != null) {
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(et_query.windowToken, 0)
         }
     }
-
 }
