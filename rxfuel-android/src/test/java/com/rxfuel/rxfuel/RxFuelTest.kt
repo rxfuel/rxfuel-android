@@ -40,15 +40,14 @@ class RxFuelTest {
         val activityController = Robolectric.buildActivity(TestActivity::class.java).create().start()
         val testActivity = spy(activityController.get())
         val rxFuel = spy(RxFuel(testActivity))
-        `when`(rxFuel.getViewModeFactory()).thenReturn(FakeViewModelFactory.instance)
 
+        `when`(rxFuel.getViewModeFactory()).thenReturn(FakeViewModelFactory.instance)
         rxFuel.bind(TestViewModel(TestProcessor()))
 
         verify(testActivity).render(TestViewState("idle state"))
         verify(testActivity).render(TestViewState("First Event -> Result"))
         verify(testActivity).render(TestViewState("Second Event -> Result"))
         verify(testActivity).render(TestViewState("Third Event -> Action -> Result"))
-
         rxFuel.unbind()
         activityController.destroy()
     }
@@ -64,7 +63,23 @@ class RxFuelTest {
         rxFuel.bind(testViewModel)
 
         verify(testActivity).render(TestViewState("Initial Event -> Result"))
+        rxFuel.unbind()
+    }
+
+    @Test
+    fun verifyLastStateIsReRenderedOnActivityRecreation(){
+        val activityController = Robolectric.buildActivity(TestActivity::class.java).create().start()
+        val testActivity = spy(activityController.get())
+        val rxFuel = RxFuel(testActivity)
+        rxFuel.bind(TestViewModel(TestProcessor()))
+        verify(testActivity).render(TestViewState("idle state"))
+        verify(testActivity).render(TestViewState("First Event -> Result"))
+        verify(testActivity).render(TestViewState("Second Event -> Result"))
 
         rxFuel.unbind()
+        activityController.restart()
+        rxFuel.bind(TestViewModel(TestProcessor()))
+
+        verify(testActivity, times(2)).render(TestViewState("Third Event -> Action -> Result"))
     }
 }
