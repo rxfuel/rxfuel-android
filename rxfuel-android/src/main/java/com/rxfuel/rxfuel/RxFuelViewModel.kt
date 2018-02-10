@@ -4,7 +4,6 @@ import android.arch.lifecycle.ViewModel
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import io.reactivex.subjects.PublishSubject
-import java.util.concurrent.TimeUnit
 
 /**
  * Creates an Observable of ViewState by merging all events including initial events if any.
@@ -94,11 +93,13 @@ abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuel
 
         return mainObservable
                 .scan(idleState, reducer())
-                .flatMap {state ->
+                .flatMap { state ->
                     if(state.navigate!=null) {
-                        Observable.just(1, TimeUnit.MICROSECONDS)
-                                .map { state.apply { navigate = null } }
+                        Observable.just(state)
                                 .startWith(state)
+                                .doAfterNext {
+                                    state.apply { navigate = null }
+                                }
                     } else
                         Observable.just(state)
                 }

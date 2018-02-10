@@ -54,6 +54,9 @@ class RxFuel(val context: FragmentActivity) {
         disposables.add(
                 persistedViewModel
                         .states()
+                        .doOnNext {
+                            System.out.println("RxFuel - " + it.toString())
+                        }
                         .subscribe({ viewState -> rxFuelView.render(viewState) })
                         { throw it }
         )
@@ -65,7 +68,7 @@ class RxFuel(val context: FragmentActivity) {
      * Disposes states subscription
      */
     fun unbind() {
-        disposables.dispose()
+        disposables.clear()
     }
 
     /**

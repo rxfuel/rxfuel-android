@@ -7,8 +7,9 @@ class TestViewModel(processor: TestProcessor?) : RxFuelViewModel<TestEvent,TestA
 
     override fun eventToResult(event: TestEvent): TestResult {
         return when(event){
-            is TestEvent.SampleEvent1 -> TestResult(event.text + " -> Result")
-            else -> TestResult("")
+            is TestEvent.SampleEvent1 -> TestResult.SampleResult(event.text + " -> Result")
+            TestEvent.NavigateEvent -> TestResult.NavigateResult
+            else -> TestResult.SampleResult("")
         }
     }
 
@@ -20,6 +21,9 @@ class TestViewModel(processor: TestProcessor?) : RxFuelViewModel<TestEvent,TestA
     }
 
     override fun resultToViewState(previousState: TestViewState, result: TestResult): TestViewState {
-        return TestViewState(text = result.text)
+        return when(result){
+            is TestResult.SampleResult -> previousState.copy(text = result.text)
+            TestResult.NavigateResult -> previousState.copy(navigate = TestActivity::class)
+        }
     }
 }

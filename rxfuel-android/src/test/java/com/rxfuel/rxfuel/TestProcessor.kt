@@ -14,7 +14,7 @@ class TestProcessor : RxFuelProcessor<TestAction, TestResult>() {
             ObservableTransformer<TestAction, TestResult> { actions ->
                 actions.flatMap { action ->
                     Observable.just(" -> Result")
-                            .map { response -> TestResult(action.text + response) }
+                            .map { response -> TestResult.SampleResult(action.text + response) }
                             .observeOn(AndroidSchedulers.mainThread())
                 }
             }
