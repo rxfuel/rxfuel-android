@@ -7,6 +7,6 @@ In your build.gradle :
 
 ```gradle
 dependencies {
-    implementation 'com.rxfuel.rxfuel:rxfuel-android:0.0.3'
+    implementation 'com.rxfuel.rxfuel:rxfuel-android:0.0.5'
 }
 ```
