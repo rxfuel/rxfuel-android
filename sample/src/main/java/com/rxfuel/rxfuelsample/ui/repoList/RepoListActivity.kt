@@ -36,6 +36,7 @@ class RepoListActivity : DaggerAppCompatActivity(), RxFuelView<RepoListEvent, Re
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
         rv_repos.adapter = reposAdapter
         rxFuel.bind(repoListViewModel)
@@ -59,15 +60,20 @@ class RepoListActivity : DaggerAppCompatActivity(), RxFuelView<RepoListEvent, Re
     }
 
     override fun render(state: RepoListViewState) {
-        Log.d("RepoListActivity",state.navigate.toString())
         progressBar.visibility = if(state.loading) VISIBLE else GONE
         rv_repos.visibility = if(state.loading || state.repos.isEmpty()) GONE else VISIBLE
-        if(!state.loading) reposSubject.onNext(state.repos)
-        if(state.hideKeyboard) hideKeyboard()
-        if(state.errorMessage!=null) Toast.makeText(this,state.errorMessage,LENGTH_LONG).show()
+        if(!state.loading)
+            reposSubject.onNext(state.repos)
+        if(state.hideKeyboard)
+            hideKeyboard()
+        if(state.errorMessage!=null)
+            Toast.makeText(this,state.errorMessage,LENGTH_LONG).show()
         if(state.navigate!=null) {
             when(state.navigate){
-                RepoListActivity::class -> rxFuel.navigateTo(DetailActivity::class, DetailEvent.DisplayRepoEvent(state.lastClickedRepo!!))
+                RepoListActivity::class -> rxFuel.navigateTo(
+                        DetailActivity::class,
+                        DetailEvent.DisplayRepoEvent(state.lastClickedRepo!!)
+                )
             }
         }
     }

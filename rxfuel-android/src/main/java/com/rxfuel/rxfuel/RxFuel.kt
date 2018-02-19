@@ -3,6 +3,9 @@ package com.rxfuel.rxfuel
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.support.v4.app.FragmentActivity
+import com.rxfuel.rxfuel.internal.ViewModelFactory
+import io.reactivex.Observable
+import io.reactivex.ObservableTransformer
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import kotlin.reflect.KClass
@@ -28,8 +31,8 @@ class RxFuel(val context: FragmentActivity) {
      * @throws RxFuelException
      */
     @SuppressWarnings("unchecked")
-    inline fun <reified E : RxFuelEvent, A : RxFuelAction, R : RxFuelResult, VS : RxFuelViewState, reified V : RxFuelView<E, VS>, VM :
-    RxFuelViewModel<E, A, R, VS>> bind(viewModel: VM) {
+    inline fun <reified E : RxFuelEvent, VS : RxFuelViewState, reified V : RxFuelView<E, VS>, VM :
+    RxFuelViewModel<E, VS>> bind(viewModel: VM) {
 
         getViewModeFactory().registerViewModel(viewModel)
 
@@ -54,9 +57,6 @@ class RxFuel(val context: FragmentActivity) {
         disposables.add(
                 persistedViewModel
                         .states()
-                        .doOnNext {
-                            System.out.println("RxFuel - " + it.toString())
-                        }
                         .subscribe({ viewState -> rxFuelView.render(viewState) })
                         { throw it }
         )
@@ -102,6 +102,48 @@ class RxFuel(val context: FragmentActivity) {
          * Subject to handle Event passes between activities on navigation.
          */
         val initialEventSubject: BehaviorSubject<RxFuelEvent> = BehaviorSubject.create<RxFuelEvent>()
+
+        private var processorMap : HashMap<KClass<out RxFuelAction>,
+                ObservableTransformer<out RxFuelAction, out RxFuelResult>> = hashMapOf()
+
+        @Suppress("UNCHECKED_CAST")
+        fun process(): ObservableTransformer<RxFuelAction, RxFuelResult> {
+            return ObservableTransformer { actions ->
+                actions.publish({ shared ->
+                    Observable.merge<RxFuelResult>(
+                            RxFuel.processorMap.map {
+                                shared.ofType(it.key.java)
+                                    .compose(it.value
+                                            as ObservableTransformer<in RxFuelAction,
+                                            out RxFuelResult>
+                                    )
+                            }
+                    )
+                })
+            }
+        }
+
+        /**
+         * Registers custom processor module with RxFuel. Registration must be done on Application onCreate method.
+         * Only registered processor module will be triggered on action.
+         *
+         * @param processorHolders list of all [RxFuelProcessorModule] instances
+         */
+        @Suppress("UNCHECKED_CAST")
+        fun registerProcessorModule(vararg processorHolders : RxFuelProcessorModule) {
+            for(processorHolder in processorHolders){
+                processorHolder.javaClass.declaredFields
+                        .filter {
+                            it.isAccessible = true
+                            it.annotations.any { annotation -> annotation is RxFuelProcessor } &&
+                                    it.get(processorHolder) is ObservableTransformer<*,*>
+                        }
+                        .forEach {
+                            processorMap[it.getAnnotation(RxFuelProcessor::class.java).actionClass] = it.get(processorHolder) as ObservableTransformer<out RxFuelAction, out RxFuelResult>
+                        }
+            }
+        }
+
     }
 
 }

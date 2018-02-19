@@ -1,27 +1,23 @@
 package com.rxfuel.rxfuel
 
 import android.arch.lifecycle.ViewModel
+import com.rxfuel.rxfuel.RxFuel.Companion.process
 import io.reactivex.Observable
+import io.reactivex.ObservableTransformer
 import io.reactivex.functions.BiFunction
+import io.reactivex.observers.TestObserver
 import io.reactivex.subjects.PublishSubject
+import kotlin.reflect.full.findAnnotation
 
 /**
  * Creates an Observable of ViewState by merging all events including initial events if any.
  *
  * @param E the type of Event in this context.
- * @param A the type of Action in this context.
- * @param R the type of Result in this context.
  * @param VS the type of RxFuelViewState in this context.
  * @constructor Creates ViewModel instance with processor.
  * @author Salah (nh.salah@gmail.com)
  */
-abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuelResult,
-        VS : RxFuelViewState>(private val processor : RxFuelProcessor<A,R>?) : ViewModel() {
-
-    /**
-     * Empty constructor to use in case no processor
-     */
-    constructor() : this(null)
+abstract class RxFuelViewModel<E : RxFuelEvent, VS : RxFuelViewState> : ViewModel() {
 
     /**
      * Idle state is rendered initially.
@@ -35,35 +31,45 @@ abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuel
     var initialEvent : E? = null
 
     /**
-     * Maps event to result for local(synchronous) events.
-     *
-     * @param event local event to be converted to result
-     * @return result of event
-     */
-    abstract fun eventToResult(event: E) : R
-
-    /**
      * Maps event to action for processable(asynchronous) events.
      *
      * @param event event to be converted to an action
      * @return action to the corresponding event
      */
-    abstract fun eventToAction(event: E) : A
+    abstract fun eventToAction(event: E) : RxFuelAction
 
     /**
-     * Maps result to ViewState to render the UI.
+     * Maps result to ViewState for [Scope.DOMAIN] scoped events.
      *
      * @param previousState last rendered ViewState
      * @param result result data to create new ViewState.
      * @return new ViewState.
      */
-    abstract fun resultToViewState(previousState: VS, result: R) : VS
+    abstract fun resultToViewState(previousState: VS, result: RxFuelResult) : VS
+
+    /**
+     * Maps events to ViewState for [Scope.UI] scoped events.
+     *
+     * @param previousState last rendered ViewState
+     * @param event event data to create new ViewState.
+     * @return new ViewState.
+     */
+    abstract fun eventToViewState(previousState: VS, event: E) : VS
 
     private val eventsSubject: PublishSubject<E> = PublishSubject.create()
+
     private val statesObservable: Observable<VS> = compose()
 
+    /**
+     * Observable that emits view states.
+     * Subscribe to this with your [TestObserver] for unit testing.
+     */
     fun states(): Observable<VS> = statesObservable
 
+    /**
+     * Takes in Event Observable for processing.
+     * Use this to pass your Event in unit testing.
+     */
     fun processEvents(events: Observable<E>?) {
         if(events!=null && initialEvent!=null)
             events.startWith(initialEvent).subscribe(eventsSubject)
@@ -74,40 +80,46 @@ abstract class RxFuelViewModel<E : RxFuelEvent, out A : RxFuelAction, R : RxFuel
     }
 
     private fun compose(): Observable<VS> {
-
-        val mainObservable =
-                if(processor!=null)
-                    Observable.merge(
-                            eventsSubject
-                                    .filter{ event -> !event.isLocal }
-                                    .map(this::eventToAction)
-                                    .compose(processor.process()),
-                            eventsSubject
-                                    .filter{ event -> event.isLocal}
-                                    .map(this::eventToResult)
-                    )
-                else
-                    eventsSubject
-                            .filter{ event -> event.isLocal}
-                            .map(this::eventToResult)
-
-        return mainObservable
-                .scan(idleState, reducer())
-                .flatMap { state ->
-                    if(state.navigate!=null) {
-                        Observable.just(state)
-                                .startWith(state)
-                                .doAfterNext {
-                                    state.apply { navigate = null }
-                                }
-                    } else
-                        Observable.just(state)
-                }
+        return eventsSubject
+                .compose(eventsTransformer())
+                .scan(idleState, accumulator())
+                .compose(navigationReply())
                 .replay(1)
                 .autoConnect(0)
     }
 
-    private fun reducer(): BiFunction<VS, R, VS>
-            = BiFunction { previousState: VS, result: R -> resultToViewState(previousState,result) }
+    private fun eventsTransformer() =
+            ObservableTransformer<E, Any> { events ->
+                events.flatMap { event ->
+                    when(event::class.findAnnotation<EventScope>()?.scope) {
+                        Scope.DOMAIN -> Observable.just(event)
+                                .map(this::eventToAction).compose(process())
+                        else -> Observable.just(event)
+                    }
+                }
+            }
 
+    private fun navigationReply() =
+            ObservableTransformer<VS, VS> { states ->
+                states.flatMap { state ->
+                    if(state.navigate!=null)
+                        Observable.just(state)
+                                .startWith(state)
+                                .doAfterNext { state.apply { navigate = null } }
+                    else
+                        Observable.just(state)
+                }
+            }
+
+    private fun accumulator(): BiFunction<VS, Any, VS> = BiFunction {
+        previousState: VS, event: Any -> viewStateGenerator(previousState, event)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun viewStateGenerator(previousState: VS, feed: Any) : VS {
+        return if(feed is RxFuelEvent)
+            eventToViewState(previousState, feed as E)
+        else
+            resultToViewState(previousState, feed as RxFuelResult)
+    }
 }

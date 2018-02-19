@@ -1,12 +1,10 @@
 package com.rxfuel.rxfuel
 
 import android.app.Activity
-import android.support.v4.app.Fragment
-import android.view.ViewGroup
 import io.reactivex.Observable
 
 /**
- * Interface to be implemented with [Activity], [Fragment] or [ViewGroup]
+ * Interface to be implemented with [Activity]
  * Takes in events that will be handled by ViewModel.
  *
  * @param E the type of Event in this context.

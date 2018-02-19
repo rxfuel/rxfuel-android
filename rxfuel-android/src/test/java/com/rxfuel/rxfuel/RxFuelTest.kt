@@ -1,7 +1,6 @@
 package com.rxfuel.rxfuel
 
 import android.support.v4.app.FragmentActivity
-import com.nhaarman.mockito_kotlin.argumentCaptor
 import io.reactivex.Observable
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.plugins.RxJavaPlugins
@@ -12,7 +11,6 @@ import org.junit.runner.RunWith
 import org.junit.Rule
 import org.junit.rules.ExpectedException
 import org.mockito.Mockito.*
-import org.mockito.MockitoAnnotations.initMocks
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Robolectric
 

@@ -1,4 +1,4 @@
-package com.rxfuel.rxfuel
+package com.rxfuel.rxfuel.internal
 
 import android.annotation.SuppressLint
 import android.arch.lifecycle.ViewModel

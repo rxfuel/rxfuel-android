@@ -1,7 +1,9 @@
-package com.rxfuel.rxfuelsample.ui.repoList
+package com.rxfuel.rxfuelsample.data.processor
 
 import com.rxfuel.rxfuel.RxFuelProcessor
 import com.rxfuel.rxfuelsample.network.GithubApi
+import com.rxfuel.rxfuelsample.ui.repoList.RepoListAction
+import com.rxfuel.rxfuelsample.ui.repoList.RepoListResult
 import io.reactivex.ObservableTransformer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

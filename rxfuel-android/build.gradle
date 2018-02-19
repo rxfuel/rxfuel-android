@@ -3,6 +3,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'org.jetbrains.dokka-android'
+apply plugin: 'maven'
+
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7
 
 android {
     compileSdkVersion 27
@@ -11,7 +15,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
-        versionName "0.0.5"
+        versionName "0.0.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -22,11 +26,13 @@ android {
         }
     }
 
+
     testOptions {
         unitTests {
             includeAndroidResources = true
         }
     }
+
 }
 
 ext {
@@ -42,7 +48,7 @@ ext {
     siteUrl = 'https://rxfuel.github.io'
     gitUrl = 'https://github.com/rxfuel/rxfuel-android'
 
-    libraryVersion = '0.0.5'
+    libraryVersion = '0.0.6'
 
     developerId = 'rxfuel'
     developerName = 'Salah Abdul Salam'
@@ -65,6 +71,8 @@ task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+
     kapt "android.arch.lifecycle:compiler:$arch_version"
     implementation "android.arch.lifecycle:extensions:$arch_version"
     implementation "android.arch.lifecycle:runtime:$arch_version"
@@ -76,8 +84,8 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
     testImplementation "org.robolectric:robolectric:3.6.1"
-    testImplementation 'org.mockito:mockito-core:2.13.0'
-    testCompile "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"
+    testImplementation 'org.mockito:mockito-core:2.15.0'
+    testImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"
 }
 
 apply from: rootProject.file('gradle/install.gradle')

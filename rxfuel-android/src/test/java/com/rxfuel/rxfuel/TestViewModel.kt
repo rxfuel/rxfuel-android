@@ -1,6 +1,6 @@
 package com.rxfuel.rxfuel
 
-class TestViewModel(processor: TestProcessor?) : RxFuelViewModel<TestEvent,TestAction,TestResult,TestViewState>(processor) {
+class TestViewModel(processor: TestProcessor?) : RxFuelViewModel<TestEvent, TestViewState>(processor) {
     override var idleState: TestViewState
         get() = TestViewState("idle state")
         set(value) {}

@@ -1,5 +1,7 @@
 package com.rxfuel.rxfuelsample.ui.repoList
 
+import com.rxfuel.rxfuelsample.data.api.ApiProcessorModule
+import com.rxfuel.rxfuelsample.data.processor.ApiProcessor
 import com.rxfuel.rxfuelsample.di.DaggerTestComponent
 import io.reactivex.observers.TestObserver
 import org.junit.Before
@@ -31,7 +33,7 @@ class RepoListViewModelTest {
 
         component.inject(this)
 
-        repoListViewModel = RepoListViewModel(RepoListProcessor(githubApi))
+        repoListViewModel = RepoListViewModel(ApiProcessorModule(githubApi))
 
         testObserver = repoListViewModel.states().test()
 
