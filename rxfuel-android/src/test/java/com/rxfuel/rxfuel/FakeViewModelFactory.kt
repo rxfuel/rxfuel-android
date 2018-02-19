@@ -2,6 +2,7 @@ package com.rxfuel.rxfuel
 
 import android.annotation.SuppressLint
 import android.arch.lifecycle.ViewModel
+import com.rxfuel.rxfuel.internal.ViewModelFactory
 
 class FakeViewModelFactory : ViewModelFactory() {
 
