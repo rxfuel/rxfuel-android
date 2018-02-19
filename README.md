@@ -1,6 +1,5 @@
 # RxFuel - Android
-![RxFuel Logo](https://raw.githubusercontent.com/rxfuel/rxfuel.github.io/master/assets/images/logo_colored.png | width=100)
-
+<img src="https://raw.githubusercontent.com/rxfuel/rxfuel.github.io/master/assets/images/logo_colored.png" width="100" height="100">
 A lightweight framework for Android to create fully reactive apps. 
 For documentation and additional information see the [website](https://rxfuel.github.io/).
 
