@@ -8,10 +8,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import retrofit2.mock.BehaviorDelegate
 
-/**
- * Created by salah on 2/2/18.
- */
-
 class FakeGithubApi(delegate : BehaviorDelegate<GithubApi>) : GithubApi{
 
     var mdelegate: BehaviorDelegate<GithubApi> = delegate

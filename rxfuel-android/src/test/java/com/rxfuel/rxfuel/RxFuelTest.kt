@@ -66,7 +66,8 @@ class RxFuelTest {
 
     @Test
     fun verifyInitialEventIsEmitted(){
-        val testActivity = spy(Robolectric.buildActivity(MockActivity::class.java).create().get())
+        val activityController = Robolectric.buildActivity(MockActivity::class.java).create().start()
+        val testActivity = spy(activityController.get())
         val rxFuel = spy(RxFuel(testActivity))
         `when`(rxFuel.getViewModeFactory()).thenReturn(FakeViewModelFactory.instance)
         val testViewModel = TestViewModel()
@@ -76,6 +77,7 @@ class RxFuelTest {
 
         verify(testActivity).render(MockViewState("Initial Event -> ViewState"))
         rxFuel.unbind()
+        activityController.destroy()
     }
 
     @Test
@@ -121,6 +123,7 @@ class RxFuelTest {
         com.nhaarman.mockito_kotlin.verify(testActivity, times(3))
                 .render(MockViewState(text = "idle state"))
         rxFuel.unbind()
+        activityController.destroy()
     }
 
     @Test
@@ -134,5 +137,6 @@ class RxFuelTest {
         verify(testActivity, times(1)).render(com.nhaarman.mockito_kotlin.any())
 
         rxFuel.unbind()
+        activityController.destroy()
     }
 }

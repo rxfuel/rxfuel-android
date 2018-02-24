@@ -15,10 +15,6 @@ import javax.inject.Singleton
 import retrofit2.mock.MockRetrofit
 import retrofit2.mock.NetworkBehavior
 
-/**
- * Created by salah on 2/2/18.
- */
-
 @Module
 class TestNetworkModule {
 

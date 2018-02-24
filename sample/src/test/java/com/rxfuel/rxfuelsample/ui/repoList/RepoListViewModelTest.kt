@@ -1,64 +1,69 @@
 package com.rxfuel.rxfuelsample.ui.repoList
 
+import com.rxfuel.rxfuel.TestRxFuelViewModel
 import com.rxfuel.rxfuelsample.data.api.ApiProcessorModule
-import com.rxfuel.rxfuelsample.data.processor.ApiProcessor
 import com.rxfuel.rxfuelsample.di.DaggerTestComponent
 import io.reactivex.observers.TestObserver
 import org.junit.Before
-import com.rxfuel.rxfuelsample.network.GithubApi
-import io.reactivex.Observable
-import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.plugins.RxJavaPlugins
 import org.junit.Test
 import javax.inject.Inject
-import io.reactivex.schedulers.Schedulers
 import org.junit.After
 
 class RepoListViewModelTest {
 
-    lateinit var repoListViewModel: RepoListViewModel
+    private lateinit var testRxFuel: TestRxFuelViewModel<RepoListEvent, RepoListViewState>
 
-    lateinit var testObserver: TestObserver<RepoListViewState>
+    private lateinit var testObserver: TestObserver<RepoListViewState>
 
     @Inject
-    lateinit var githubApi: GithubApi
+    lateinit var apiProcessorModule : ApiProcessorModule
 
     @Before
     fun setupRepoListViewModelTest() {
+        DaggerTestComponent.builder().build().inject(this)
+        testRxFuel = TestRxFuelViewModel(RepoListViewModel())
+                .withProcessorModules(apiProcessorModule)
+                .synchronously()
 
-        RxAndroidPlugins.setInitMainThreadSchedulerHandler {Schedulers.trampoline()}
-        RxJavaPlugins.setIoSchedulerHandler { Schedulers.trampoline() }
-
-        val component = DaggerTestComponent.builder().build()
-
-        component.inject(this)
-
-        repoListViewModel = RepoListViewModel(ApiProcessorModule(githubApi))
-
-        testObserver = repoListViewModel.states().test()
-
+        testObserver = testRxFuel.getObserver()
     }
 
     @Test
     fun testRepoList() {
-        repoListViewModel.processEvents(Observable.just(
-                RepoListEvent.Search("retrofit")
-        ))
+        testRxFuel.events(RepoListEvent.Search("retrofit"))
 
-        testObserver.assertValueAt(2,
-                { state ->
-                    state.repos.size == 2 &&
+        testObserver.assertValueAt(0, { state ->
+            state == RepoListViewState(
+                    false,
+                    listOf(),
+                    null,
+                    null,
+                    false,
+                    null)
+        })
+
+        testObserver.assertValueAt(1, { state ->
+            state == RepoListViewState(
+                    true,
+                    listOf(),
+                    null,
+                    null,
+                    true,
+                    null)
+        })
+
+        testObserver.assertValueAt(2, { state ->
+            state.repos.size == 2 &&
                     state.repos[0].full_name == "mRepo1" &&
                     state.repos[1].full_name == "mRepo2"
-                }
-        )
+        })
+
 
         testObserver.assertNoErrors()
     }
 
     @After
-    fun After(){
-        RxAndroidPlugins.reset()
-        RxJavaPlugins.reset()
+    fun after(){
+        testRxFuel.destroy()
     }
 }
