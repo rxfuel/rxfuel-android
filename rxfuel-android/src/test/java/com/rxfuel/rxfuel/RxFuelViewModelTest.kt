@@ -37,6 +37,5 @@ class RxFuelViewModelTest {
         testObserver.assertValueAt(1, { state -> state.text == "First Event -> ViewState" })
         testObserver.assertValueAt(2, { state -> state.text == "Second Event -> Action -> Result -> ViewState" })
         testObserver.assertNoErrors()
-        testObserver.assertComplete()
     }
 }

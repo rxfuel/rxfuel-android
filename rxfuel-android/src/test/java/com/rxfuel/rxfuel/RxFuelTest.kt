@@ -1,6 +1,7 @@
 package com.rxfuel.rxfuel
 
 import android.support.v4.app.FragmentActivity
+import com.rxfuel.rxfuel.internal.InternalSubjects.initialEventSubject
 import com.rxfuel.rxfuel.testData.mockActivity.*
 import com.rxfuel.rxfuel.testData.mockProcessorModule.MockProcessor
 import io.reactivex.Observable
@@ -72,7 +73,7 @@ class RxFuelTest {
         `when`(rxFuel.getViewModeFactory()).thenReturn(FakeViewModelFactory.instance)
         val testViewModel = TestViewModel()
 
-        RxFuel.initialEventSubject.onNext(MockEvent.SampleEvent1("Initial Event"))
+        initialEventSubject.onNext(MockEvent.SampleEvent1("Initial Event"))
         rxFuel.bind(testViewModel)
 
         verify(testActivity).render(MockViewState("Initial Event -> ViewState"))
@@ -119,9 +120,11 @@ class RxFuelTest {
                 )
         rxFuel.bind(TestViewModel())
 
-        //@TODO update test
-        com.nhaarman.mockito_kotlin.verify(testActivity, times(3))
+        com.nhaarman.mockito_kotlin.verify(testActivity)
                 .render(MockViewState(text = "idle state"))
+
+        com.nhaarman.mockito_kotlin.verify(testActivity)
+                .render(MockViewState(text = "idle state", navigate = MockActivity::class))
         rxFuel.unbind()
         activityController.destroy()
     }

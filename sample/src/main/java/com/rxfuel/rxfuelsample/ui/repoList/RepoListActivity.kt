@@ -25,7 +25,7 @@ import com.rxfuel.rxfuelsample.ui.detail.DetailEvent
 
 class RepoListActivity : DaggerAppCompatActivity(), RxFuelView<RepoListEvent, RepoListViewState> {
 
-    private val rxFuel : RxFuel = RxFuel(this)
+    private val rxFuel = RxFuel(this)
 
     @Inject
     lateinit var repoListViewModel : RepoListViewModel
@@ -70,7 +70,7 @@ class RepoListActivity : DaggerAppCompatActivity(), RxFuelView<RepoListEvent, Re
             Toast.makeText(this,state.errorMessage,LENGTH_LONG).show()
         if(state.navigate!=null) {
             when(state.navigate){
-                RepoListActivity::class -> rxFuel.navigateTo(
+                DetailActivity::class -> rxFuel.navigateTo(
                         DetailActivity::class,
                         DetailEvent.DisplayRepoEvent(state.lastClickedRepo!!)
                 )

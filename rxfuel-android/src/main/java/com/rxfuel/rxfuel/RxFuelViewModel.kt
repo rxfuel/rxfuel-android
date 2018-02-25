@@ -1,11 +1,11 @@
 package com.rxfuel.rxfuel
 
 import android.arch.lifecycle.ViewModel
-import com.rxfuel.rxfuel.RxFuel.Companion.process
+import com.rxfuel.rxfuel.internal.InternalSubjects.navigationAcknowledgment
+import com.rxfuel.rxfuel.internal.ProcessorController.process
 import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
 import io.reactivex.functions.BiFunction
-import io.reactivex.observers.TestObserver
 import io.reactivex.subjects.PublishSubject
 import kotlin.reflect.full.findAnnotation
 
@@ -62,13 +62,11 @@ abstract class RxFuelViewModel<E : RxFuelEvent, VS : RxFuelViewState> : ViewMode
 
     /**
      * Observable that emits view states.
-     * Subscribe to this with your [TestObserver] for unit testing.
      */
     fun states(): Observable<VS> = statesObservable
 
     /**
      * Takes in Event Observable for processing.
-     * Use this to pass your Event in unit testing.
      */
     fun processEvents(events: Observable<E>?) {
         if(events!=null && initialEvent!=null)
@@ -99,15 +97,15 @@ abstract class RxFuelViewModel<E : RxFuelEvent, VS : RxFuelViewState> : ViewMode
                 }
             }
 
+
     private fun navigationReply() =
             ObservableTransformer<VS, VS> { states ->
                 states.flatMap { state ->
-                    if(state.navigate!=null)
-                        Observable.just(state)
-                                .startWith(state)
-                                .doAfterNext { state.apply { navigate = null } }
-                    else
-                        Observable.just(state)
+                    navigationAcknowledgment
+                            .flatMap {
+                                Observable.just(state.apply { navigate = null })
+                            }
+                            .startWith(state)
                 }
             }
 

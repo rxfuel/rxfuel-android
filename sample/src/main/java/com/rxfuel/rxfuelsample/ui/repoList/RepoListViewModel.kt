@@ -4,6 +4,7 @@ import com.rxfuel.rxfuel.RxFuelResult
 import com.rxfuel.rxfuel.RxFuelViewModel
 import com.rxfuel.rxfuelsample.data.api.ApiAction
 import com.rxfuel.rxfuelsample.data.api.ApiResult
+import com.rxfuel.rxfuelsample.ui.detail.DetailActivity
 import javax.inject.Inject
 
 class RepoListViewModel @Inject constructor(): RxFuelViewModel<RepoListEvent, RepoListViewState>() {
@@ -30,7 +31,7 @@ class RepoListViewModel @Inject constructor(): RxFuelViewModel<RepoListEvent, Re
 
     override fun eventToViewState(previousState: RepoListViewState, event: RepoListEvent): RepoListViewState {
         return when(event) {
-            is RepoListEvent.RepoClick -> previousState.copy(navigate = RepoListActivity::class, lastClickedRepo = event.repo)
+            is RepoListEvent.RepoClick -> previousState.copy(navigate = DetailActivity::class, lastClickedRepo = event.repo)
             else -> idleState
         }
     }
