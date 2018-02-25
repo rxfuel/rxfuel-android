@@ -16,4 +16,5 @@ interface RxFuelViewState {
      * A new ViewState will be trigger with [navigate] = null immediately after rendering the ViewState with navigation.
      */
     var navigate : KClass<out FragmentActivity>?
+
 }

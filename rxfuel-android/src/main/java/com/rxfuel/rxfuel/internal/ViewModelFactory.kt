@@ -6,30 +6,16 @@ import android.arch.lifecycle.ViewModelProvider
 
 import java.util.HashMap
 
-/**
- * Provides ViewModel instance that is persisted across activity lifecycle.
- *
- * @author Salah (nh.salah@gmail.com)
- */
 open class ViewModelFactory : ViewModelProvider.Factory {
 
-    /**
-     * [HashMap] of all ViewModel class paired with ViewModel instance
-     */
     private val viewModelHashMap = HashMap<Class<out ViewModel>, ViewModel>()
 
-    /**
-     * Adds ViewModel to [viewModelHashMap]
-     */
     fun registerViewModel(viewModel: ViewModel) {
         if (!viewModelHashMap.containsKey(viewModel.javaClass)) {
             viewModelHashMap[viewModel.javaClass] = viewModel
         }
     }
 
-    /**
-     * Provides persisted ViewModel
-     */
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         for ((key, value) in viewModelHashMap) {

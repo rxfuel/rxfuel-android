@@ -3,11 +3,12 @@ package com.rxfuel.rxfuel
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.support.v4.app.FragmentActivity
+import com.rxfuel.rxfuel.internal.InternalSubjects.initialEventSubject
+import com.rxfuel.rxfuel.internal.InternalSubjects.navigationAcknowledgment
+import com.rxfuel.rxfuel.internal.ProcessorController.processorMap
 import com.rxfuel.rxfuel.internal.ViewModelFactory
-import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.BehaviorSubject
 import kotlin.reflect.KClass
 
 /**
@@ -59,9 +60,11 @@ class RxFuel(val context: FragmentActivity) {
                         .states()
                         .subscribe({ viewState -> rxFuelView.render(viewState) })
                         { throw it }
+
         )
 
         persistedViewModel.processEvents(rxFuelView.events())
+
     }
 
     /**
@@ -80,6 +83,7 @@ class RxFuel(val context: FragmentActivity) {
     inline fun <reified E : RxFuelEvent> navigateTo(dest: KClass<out FragmentActivity>, initialEvent: E) {
         context.startActivity(Intent(context, dest.java))
         initialEventSubject.onNext(initialEvent)
+        navigationAcknowledgment.onNext(Unit)
     }
 
     /**
@@ -89,6 +93,7 @@ class RxFuel(val context: FragmentActivity) {
      */
     fun navigateTo(dest: KClass<out FragmentActivity>) {
         context.startActivity(Intent(context, dest.java))
+        navigationAcknowledgment.onNext(Unit)
     }
 
     /**
@@ -97,31 +102,6 @@ class RxFuel(val context: FragmentActivity) {
     fun getViewModeFactory() = ViewModelFactory.instance
 
     companion object {
-
-        /**
-         * Subject to handle Event passes between activities on navigation.
-         */
-        val initialEventSubject: BehaviorSubject<RxFuelEvent> = BehaviorSubject.create<RxFuelEvent>()
-
-        private var processorMap : HashMap<KClass<out RxFuelAction>,
-                ObservableTransformer<out RxFuelAction, out RxFuelResult>> = hashMapOf()
-
-        @Suppress("UNCHECKED_CAST")
-        fun process(): ObservableTransformer<RxFuelAction, RxFuelResult> {
-            return ObservableTransformer { actions ->
-                actions.publish({ shared ->
-                    Observable.merge<RxFuelResult>(
-                            RxFuel.processorMap.map {
-                                shared.ofType(it.key.java)
-                                    .compose(it.value
-                                            as ObservableTransformer<in RxFuelAction,
-                                            out RxFuelResult>
-                                    )
-                            }
-                    )
-                })
-            }
-        }
 
         /**
          * Registers custom processor module with RxFuel. Registration must be done on Application onCreate method.
@@ -139,7 +119,12 @@ class RxFuel(val context: FragmentActivity) {
                                     it.get(processorHolder) is ObservableTransformer<*,*>
                         }
                         .forEach {
-                            processorMap[it.getAnnotation(RxFuelProcessor::class.java).actionClass] = it.get(processorHolder) as ObservableTransformer<out RxFuelAction, out RxFuelResult>
+                            processorMap.put(
+                                    it.getAnnotation(RxFuelProcessor::class.java).actionClass,
+                                    it.get(processorHolder)
+                                            as ObservableTransformer
+                                    <out RxFuelAction, out RxFuelResult>
+                            )
                         }
             }
         }
