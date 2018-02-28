@@ -2,7 +2,6 @@ package com.rxfuel.rxfuelsample.ui.repoList
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast

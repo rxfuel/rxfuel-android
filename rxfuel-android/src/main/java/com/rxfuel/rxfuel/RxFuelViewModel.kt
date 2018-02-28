@@ -1,7 +1,6 @@
 package com.rxfuel.rxfuel
 
 import android.arch.lifecycle.ViewModel
-import com.rxfuel.rxfuel.internal.InternalSubjects.navigationAcknowledgment
 import com.rxfuel.rxfuel.internal.ProcessorController.process
 import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
@@ -22,7 +21,7 @@ abstract class RxFuelViewModel<E : RxFuelEvent, VS : RxFuelViewState> : ViewMode
     /**
      * Idle state is rendered initially.
      */
-    abstract var idleState : VS
+    abstract var initialState : VS
 
     /**
      * Initial event is invoked upon ViewModel binding if not null.
@@ -80,7 +79,7 @@ abstract class RxFuelViewModel<E : RxFuelEvent, VS : RxFuelViewState> : ViewMode
     private fun compose(): Observable<VS> {
         return eventsSubject
                 .compose(eventsTransformer())
-                .scan(idleState, accumulator())
+                .scan(initialState, accumulator())
                 .compose(navigationReply())
                 .replay(1)
                 .autoConnect(0)
@@ -101,13 +100,14 @@ abstract class RxFuelViewModel<E : RxFuelEvent, VS : RxFuelViewState> : ViewMode
     private fun navigationReply() =
             ObservableTransformer<VS, VS> { states ->
                 states.flatMap { state ->
-                    navigationAcknowledgment
-                            .flatMap {
-                                Observable.just(state.apply { navigate = null })
-                            }
-                            .startWith(state)
+                    if(state.navigate != null)
+                        Observable.just(state, stateAfterNavigation(state))
+                    else
+                        Observable.just(state)
                 }
             }
+
+    abstract fun stateAfterNavigation(navigationState: VS) : VS
 
     private fun accumulator(): BiFunction<VS, Any, VS> = BiFunction {
         previousState: VS, event: Any -> viewStateGenerator(previousState, event)

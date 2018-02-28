@@ -15,7 +15,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
-        versionName "0.0.7"
+        versionName "0.0.8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -47,7 +47,7 @@ ext {
     siteUrl = 'https://rxfuel.github.io'
     gitUrl = 'https://github.com/rxfuel/rxfuel-android'
 
-    libraryVersion = '0.0.7'
+    libraryVersion = '0.0.8'
 
     developerId = 'rxfuel'
     developerName = 'Salah Abdul Salam'

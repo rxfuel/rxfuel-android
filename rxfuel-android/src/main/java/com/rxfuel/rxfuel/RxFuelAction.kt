@@ -5,4 +5,13 @@ package com.rxfuel.rxfuel
  *
  * @author Salah (nh.salah@gmail.com)
  */
-interface RxFuelAction
+interface RxFuelAction{
+
+    companion object {
+
+        /**
+         *  An empty placeholder action to use when no action is required.
+         */
+        val NO_ACTION = object : RxFuelAction {}
+    }
+}
