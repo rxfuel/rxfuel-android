@@ -64,6 +64,11 @@ class RepoListViewModelTest {
             state.navigate == DetailActivity::class
         })
 
+        //test if state after navigation is observed
+        testObserver.assertValueAt(4, { state ->
+            state.navigate == null
+        })
+
         testObserver.assertNoErrors()
     }
 

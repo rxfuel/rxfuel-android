@@ -8,7 +8,6 @@ import com.rxfuel.rxfuelsample.ui.detail.DetailActivity
 import javax.inject.Inject
 
 class RepoListViewModel @Inject constructor(): RxFuelViewModel<RepoListEvent, RepoListViewState>() {
-
     override var idleState: RepoListViewState
         get() = RepoListViewState.idle()
         set(value) {}
@@ -35,4 +34,9 @@ class RepoListViewModel @Inject constructor(): RxFuelViewModel<RepoListEvent, Re
             else -> idleState
         }
     }
+
+    override fun stateAfterNavigation(previousState: RepoListViewState) : RepoListViewState {
+        return previousState.copy(navigate = null)
+    }
+
 }

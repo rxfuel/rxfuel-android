@@ -4,7 +4,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.support.v4.app.FragmentActivity
 import com.rxfuel.rxfuel.internal.InternalSubjects.initialEventSubject
-import com.rxfuel.rxfuel.internal.InternalSubjects.navigationAcknowledgment
 import com.rxfuel.rxfuel.internal.ProcessorController.processorMap
 import com.rxfuel.rxfuel.internal.ViewModelFactory
 import io.reactivex.ObservableTransformer
@@ -83,7 +82,6 @@ class RxFuel(val context: FragmentActivity) {
     inline fun <reified E : RxFuelEvent> navigateTo(dest: KClass<out FragmentActivity>, initialEvent: E) {
         context.startActivity(Intent(context, dest.java))
         initialEventSubject.onNext(initialEvent)
-        navigationAcknowledgment.onNext(Unit)
     }
 
     /**
@@ -93,7 +91,6 @@ class RxFuel(val context: FragmentActivity) {
      */
     fun navigateTo(dest: KClass<out FragmentActivity>) {
         context.startActivity(Intent(context, dest.java))
-        navigationAcknowledgment.onNext(Unit)
     }
 
     /**

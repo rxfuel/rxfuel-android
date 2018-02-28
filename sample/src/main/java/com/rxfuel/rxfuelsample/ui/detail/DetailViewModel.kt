@@ -5,7 +5,6 @@ import com.rxfuel.rxfuel.RxFuelViewModel
 import javax.inject.Inject
 
 class DetailViewModel @Inject constructor() : RxFuelViewModel<DetailEvent, DetailViewState>() {
-
     override var idleState: DetailViewState
         get() = DetailViewState.idle()
         set(value) {}
@@ -23,4 +22,9 @@ class DetailViewModel @Inject constructor() : RxFuelViewModel<DetailEvent, Detai
             is DetailEvent.DisplayRepoEvent -> previousState.copy(repo = event.repo)
         }
     }
+
+    override fun stateAfterNavigation(previousState: DetailViewState) : DetailViewState {
+        return previousState.copy(navigate = null)
+    }
+
 }

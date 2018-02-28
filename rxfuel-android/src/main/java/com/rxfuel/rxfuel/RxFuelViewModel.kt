@@ -1,7 +1,6 @@
 package com.rxfuel.rxfuel
 
 import android.arch.lifecycle.ViewModel
-import com.rxfuel.rxfuel.internal.InternalSubjects.navigationAcknowledgment
 import com.rxfuel.rxfuel.internal.ProcessorController.process
 import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
@@ -101,13 +100,14 @@ abstract class RxFuelViewModel<E : RxFuelEvent, VS : RxFuelViewState> : ViewMode
     private fun navigationReply() =
             ObservableTransformer<VS, VS> { states ->
                 states.flatMap { state ->
-                    navigationAcknowledgment
-                            .flatMap {
-                                Observable.just(state.apply { navigate = null })
-                            }
-                            .startWith(state)
+                    if(state.navigate != null)
+                        Observable.just(state, stateAfterNavigation(state))
+                    else
+                        Observable.just(state)
                 }
             }
+
+    abstract fun stateAfterNavigation(previousState: VS) : VS
 
     private fun accumulator(): BiFunction<VS, Any, VS> = BiFunction {
         previousState: VS, event: Any -> viewStateGenerator(previousState, event)

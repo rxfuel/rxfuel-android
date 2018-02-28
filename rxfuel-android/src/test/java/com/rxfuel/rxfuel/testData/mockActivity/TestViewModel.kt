@@ -32,4 +32,8 @@ class TestViewModel : RxFuelViewModel<MockEvent, MockViewState>() {
         }
     }
 
+    override fun stateAfterNavigation(previousState: MockViewState): MockViewState {
+        return previousState.copy(navigate = null)
+    }
+
 }
