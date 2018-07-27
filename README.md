@@ -1,3 +1,5 @@
+[![Build Status](https://api.travis-ci.org/rxfuel/rxfuel-android.svg?branch=master](https://travis-ci.org/rxfuel/rxfuel-android)
+
 # RxFuel - Android
 <img src="https://raw.githubusercontent.com/rxfuel/rxfuel.github.io/master/assets/images/logo_colored.png" width="100" height="100" />
 
