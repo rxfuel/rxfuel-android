@@ -12,7 +12,7 @@ For documentation and additional information see the https://rxfuel.github.io
 Add the following dependency in your module build.gradle :
 
 ```gradle
-implementation 'com.rxfuel.rxfuel:rxfuel-android:0.0.8'
+implementation 'com.rxfuel.rxfuel:rxfuel-android:0.0.9'
 ```
 
 Add `jcenter` repository in your project build.gradle : 
