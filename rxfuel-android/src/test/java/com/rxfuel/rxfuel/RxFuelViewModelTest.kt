@@ -2,7 +2,7 @@ package com.rxfuel.rxfuel
 
 import com.rxfuel.rxfuel.testData.mockActivity.MockEvent
 import com.rxfuel.rxfuel.testData.mockActivity.MockViewState
-import com.rxfuel.rxfuel.testData.mockActivity.TestViewModel
+import com.rxfuel.rxfuel.testData.mockActivity.MockViewModel
 import com.rxfuel.rxfuel.testData.mockProcessorModule.MockProcessor
 import io.reactivex.Observable
 import io.reactivex.android.plugins.RxAndroidPlugins
@@ -14,7 +14,7 @@ import org.junit.Test
 
 class RxFuelViewModelTest {
 
-    private val testViewModel = TestViewModel()
+    private val testViewModel = MockViewModel()
 
     private var testObserver : TestObserver<MockViewState> = testViewModel.states().test()
 
