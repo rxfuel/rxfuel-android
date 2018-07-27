@@ -39,7 +39,7 @@ class RxFuelTest {
         val rxFuel = RxFuel(Robolectric.setupActivity(FragmentActivity::class.java))
         thrown.expect(RxFuelException::class.java)
         thrown.expectMessage("RxFuelView not implemented")
-        rxFuel.bind(TestViewModel())
+        rxFuel.bind(MockViewModel())
         rxFuel.unbind()
     }
 
@@ -55,7 +55,7 @@ class RxFuelTest {
                 Observable.just("Second Event").map { MockEvent.SampleEvent1(it) },
                 Observable.just("Third Event").map { MockEvent.SampleEvent2(it) }
         ))
-        rxFuel.bind(TestViewModel())
+        rxFuel.bind(MockViewModel())
 
         verify(testActivity).render(MockViewState("idle state"))
         verify(testActivity).render(MockViewState("First Event -> ViewState"))
@@ -71,7 +71,7 @@ class RxFuelTest {
         val testActivity = spy(activityController.get())
         val rxFuel = spy(RxFuel(testActivity))
         `when`(rxFuel.getViewModeFactory()).thenReturn(FakeViewModelFactory.instance)
-        val testViewModel = TestViewModel()
+        val testViewModel = MockViewModel()
 
         initialEventSubject.onNext(MockEvent.SampleEvent1("Initial Event"))
         rxFuel.bind(testViewModel)
@@ -91,7 +91,7 @@ class RxFuelTest {
                 Observable.just("Second Event").map { MockEvent.SampleEvent1(it) },
                 Observable.just("Third Event").map { MockEvent.SampleEvent2(it) }
         ))
-        rxFuel.bind(TestViewModel())
+        rxFuel.bind(MockViewModel())
 
         verify(testActivity).render(MockViewState("idle state"))
         verify(testActivity).render(MockViewState("First Event -> ViewState"))
@@ -99,32 +99,10 @@ class RxFuelTest {
 
         rxFuel.unbind()
         activityController.configurationChange()
-        rxFuel.bind(TestViewModel())
+        rxFuel.bind(MockViewModel())
 
         verify(testActivity, times(2))
                 .render(MockViewState("Third Event -> Action -> Result -> ViewState"))
-        rxFuel.unbind()
-        activityController.destroy()
-    }
-
-    @Test
-    fun verifyNullNavigateStateIsRenderedAfterNavigation(){
-        val activityController = Robolectric.buildActivity(MockActivity::class.java).create().start()
-        val testActivity = spy(activityController.get())
-        val rxFuel = spy(RxFuel(testActivity))
-        `when`(rxFuel.getViewModeFactory()).thenReturn(FakeViewModelFactory.instance)
-
-        `when`(testActivity.events())
-                .thenReturn(
-                        Observable.just(MockEvent.NavigateEvent).map { MockEvent.NavigateEvent }
-                )
-        rxFuel.bind(TestViewModel())
-
-        com.nhaarman.mockito_kotlin.verify(testActivity)
-                .render(MockViewState(text = "idle state"))
-
-        com.nhaarman.mockito_kotlin.verify(testActivity)
-                .render(MockViewState(text = "idle state", navigate = MockActivity::class))
         rxFuel.unbind()
         activityController.destroy()
     }
@@ -135,9 +113,9 @@ class RxFuelTest {
         val testActivity = spy(activityController.get())
         val rxFuel = spy(RxFuel(testActivity))
         `when`(rxFuel.getViewModeFactory()).thenReturn(FakeViewModelFactory.instance)
-        rxFuel.bind(TestViewModel())
+        rxFuel.bind(MockViewModel())
 
-        verify(testActivity, times(1)).render(com.nhaarman.mockito_kotlin.any())
+        verify(testActivity, times(1)).render(com.nhaarman.mockitokotlin2.any())
 
         rxFuel.unbind()
         activityController.destroy()

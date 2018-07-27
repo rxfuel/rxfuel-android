@@ -4,7 +4,7 @@ import com.rxfuel.rxfuel.*
 import com.rxfuel.rxfuel.testData.mockProcessorModule.MockAction
 import com.rxfuel.rxfuel.testData.mockProcessorModule.MockResult
 
-class TestViewModel : RxFuelViewModel<MockEvent, MockViewState>() {
+class MockViewModel : RxFuelViewModel<MockEvent, MockViewState>() {
 
     override var initialState: MockViewState
         get() = MockViewState("idle state")
